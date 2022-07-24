@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.User;
 import com.example.demo.repository.IUserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,12 @@ public class UserController {
     @PostMapping("new")
     public User createUser(@RequestBody User user){
         return userRepository.save(user);
+    }
+
+    //delete user by Id
+    @DeleteMapping("delete/{userId}")
+    public void deleteUser(@PathVariable Long userId){
+        userRepository.deleteById(userId);
     }
 
 }

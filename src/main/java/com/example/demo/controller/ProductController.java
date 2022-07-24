@@ -22,7 +22,7 @@ public class ProductController {
         this.userRepository = userRepository;
     }
 
-    //
+    // get all products
     @GetMapping("products")
     public List<Product> getAllProducts(){
         return productRepository.findAll();
@@ -52,4 +52,6 @@ public class ProductController {
             return ResponseEntity.ok(userRepository.save(user));
         }
     }
+
+    // TODO: Create method delete Product by Id and delete this product from all users if they have it
 }
