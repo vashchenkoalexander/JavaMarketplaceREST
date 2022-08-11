@@ -5,11 +5,16 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.IProductRepository;
 import com.example.demo.repository.IUserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/v1/product/")
@@ -22,10 +27,35 @@ public class ProductController {
         this.userRepository = userRepository;
     }
 
-    // get all products
+
+    /*
+    linkTo create bounds with other methods for show it in response body in request
+    get all products
+     */
     @GetMapping("products")
-    public List<Product> getAllProducts(){
-        return productRepository.findAll();
+    CollectionModel<EntityModel<Product>> getAllProducts(){
+        List<EntityModel<Product>> products = productRepository.findAll().stream()
+                .map(product -> EntityModel.of(
+                        product,
+                        linkTo(methodOn(ProductController.class).getOneProduct(product.getId())).withSelfRel(),
+                        linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products")))
+                .collect(Collectors.toList());
+
+        return CollectionModel.of(products,
+                linkTo(methodOn(ProductController.class).getAllProducts()).withSelfRel());
+    }
+
+    /*
+    linkTo create bounds with other methods for show it in response body in request
+    getting one product by id
+     */
+    @GetMapping("{id}")
+    public EntityModel<Product> getOneProduct(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElseThrow();
+        return  EntityModel.of(product,
+                linkTo(methodOn(ProductController.class).getOneProduct(id)).withSelfRel(),
+                linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products"));
+
     }
 
     //create a new product
