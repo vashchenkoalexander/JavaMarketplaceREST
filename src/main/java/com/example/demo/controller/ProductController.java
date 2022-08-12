@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -83,5 +84,23 @@ public class ProductController {
         }
     }
 
+    /*
+    delete product by him Id
+     */
+    @DeleteMapping("{ProductId}")
+    public EntityModel<Product> deleteProductById (@PathVariable Long ProductId){
+        Product product = productRepository.findById(ProductId).orElseThrow();
+        if (product != null){
+            productRepository.deleteById(ProductId);
+            return EntityModel.of(product,
+                    linkTo(methodOn(ProductController.class).getOneProduct(ProductId)).withSelfRel(),
+                    linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products"));
+        }else{
+            return null;
+        }
+    }
+
     // TODO: Create method delete Product by Id and delete this product from all users if they have it
+
+
 }
