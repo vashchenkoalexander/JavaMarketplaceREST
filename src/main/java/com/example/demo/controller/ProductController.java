@@ -10,6 +10,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -70,22 +71,25 @@ public class ProductController {
     public ResponseEntity<?> buyProduct(@PathVariable Long UserId, @PathVariable Long ProductId) throws ChangeSetPersister.NotFoundException {
         User user = userRepository.findById(UserId).orElseThrow(ChangeSetPersister.NotFoundException::new);
         int amountOfMoney = user.getAmountOfMoney();
+        List<Product> products = new ArrayList<>();
 
         Product product = productRepository.findById(ProductId).orElseThrow(ChangeSetPersister.NotFoundException::new);
         int productPrice = product.getPrice();
+
+        products.add(product);
 
         if(amountOfMoney < productPrice){
             throw new ChangeSetPersister.NotFoundException();
         } else {
             amountOfMoney -= productPrice;
             user.setAmountOfMoney(amountOfMoney);
-            user.setAllProducts(product.getId().toString());
+            user.setProducts(products);
             return ResponseEntity.ok(userRepository.save(user));
         }
     }
 
     /*
-    delete product by him Id
+    delete product by his Id
      */
     @DeleteMapping("{ProductId}")
     public EntityModel<Product> deleteProductById (@PathVariable Long ProductId){

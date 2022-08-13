@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,22 +18,14 @@ public class User {
     private String lastName;
     @Column(name = "amountOfMoney")
     private int amountOfMoney;
-    @Column(name = "products_id")
-    private String allProducts;
-
-
-//    @OneToMany(
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true
-//    )
-//    @JoinColumn(name = "user_id")
-//    private List<Product> products = new ArrayList<>();
+    
+    @OneToMany(
+            mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL
+    )
+    @JsonManagedReference
+    private List<Product> products = new ArrayList<>();
 
     public User(){}
-
-//    public void setProducts(List<Product> products) {
-//        this.products = products;
-//    }
 
     public User(String firstName, String lastName, int amountOfMoney){
         this.firstName = firstName;
@@ -71,12 +65,11 @@ public class User {
         return amountOfMoney;
     }
 
-    public String getAllProducts() {
-        return allProducts;
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 
-    public void setAllProducts(String allProducts) {
-        this.allProducts = allProducts;
+    public List<Product> getProducts() {
+        return products;
     }
-
 }

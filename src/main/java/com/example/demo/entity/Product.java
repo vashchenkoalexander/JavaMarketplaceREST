@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,6 +14,10 @@ public class Product {
     private String name;
     @Column(name = "price")
     private int price;
+
+    @ManyToOne(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+    @JsonBackReference
+    private User user;
 
     public Product(){}
 
